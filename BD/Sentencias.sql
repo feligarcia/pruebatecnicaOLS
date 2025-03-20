@@ -17,6 +17,7 @@ INSERT INTO usuario (nombre, correo, contrasena, rol) VALUES
 ('Juan Felipe', 'juan.felipe@gmail.com', 'felipe123', 'administrador'),
 ('Martin Garcia', 'm.garcia@hotmail.com', 'magar123', 'auxiliar');
 
+
 -- generar datos semillas para comercintes
 INSERT INTO comerciante (nombre, municipio, telefono, correo, fecha_registro, estado, userid) VALUES
 ('Ricardo Arias', 'Medellin', '3003003030', 'r.arias@exito.com', '2000-01-15 10:00:00', 'activo', 1),
@@ -24,3 +25,16 @@ INSERT INTO comerciante (nombre, municipio, telefono, correo, fecha_registro, es
 ('Deiby Vega', 'Bogota', '3003003030', 'contacto@platzi.com', '2020-03-05 09:45:00', 'activo', 1),
 ('OLS&D', 'Cali', '3003003030', 'ventas@ols.com', '2002-03-20 14:15:00', 'inactivo', 2),
 ('Rappi', 'Cali', '3003003030', 'soporte@rappi.com', '2024-04-01 16:00:00', 'activo', 1);
+
+-- generar datos semillas para comercintes establecimientos
+INSERT INTO establecimiento (nombre, ingresos, numempleados, comid, userid) VALUES
+('Exito', 500000000.00, 200, 1, 1),
+('Bancolombia', 1000000000.00, 500, 2, 2),
+('Grupo Aval', 750000000.00, 300, 3, 1),
+('Surtigas', 300000000.00, 150, 4, 2),
+('Rappi Express', 200000000.00, 100, 5, 1),
+('Exito Laureles', 100000000.00, 50, 1, 1),
+('Nequi', 50000000.00, 10, 2, 2),
+('OLS CALI SAS', 600000000.00, 250, 3, 1),
+('Naturgy', 350000000.00, 120, 4, 2),
+('Rappipay', 150000000.00, 80, 5, 1);
