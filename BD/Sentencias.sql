@@ -17,3 +17,10 @@ INSERT INTO usuario (nombre, correo, contrasena, rol) VALUES
 ('Juan Felipe', 'juan.felipe@gmail.com', 'felipe123', 'administrador'),
 ('Martin Garcia', 'm.garcia@hotmail.com', 'magar123', 'auxiliar');
 
+-- generar datos semillas para comercintes
+INSERT INTO comerciante (nombre, municipio, telefono, correo, fecha_registro, estado, userid) VALUES
+('Ricardo Arias', 'Medellin', '3003003030', 'r.arias@exito.com', '2000-01-15 10:00:00', 'activo', 1),
+('David Velez', 'Medellin', '3003003030', 'info@nu.com', '2023-02-10 11:30:00', 'activo', 2),
+('Deiby Vega', 'Bogota', '3003003030', 'contacto@platzi.com', '2020-03-05 09:45:00', 'activo', 1),
+('OLS&D', 'Cali', '3003003030', 'ventas@ols.com', '2002-03-20 14:15:00', 'inactivo', 2),
+('Rappi', 'Cali', '3003003030', 'soporte@rappi.com', '2024-04-01 16:00:00', 'activo', 1);
