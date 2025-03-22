@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { LogoutIcon } from "./Icons";
 function UserCard() {
   const [role, setRole] = useState("Administrador");
   const [name, setName] = useState("John Doe");
@@ -26,6 +27,9 @@ function UserCard() {
         <h4 className="font-bold text-blue-900">Bienvenido!</h4>
         <h4>{name}</h4>
         <h4>{role}</h4>
+      </div>
+      <div className="cursor-pointer hover:text-red-500">
+        <LogoutIcon />
       </div>
     </div>
   );

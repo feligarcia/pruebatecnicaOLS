@@ -12,8 +12,9 @@ export default function LoginPage({children}) {
   const [isLogin, setIsLogin] = useState<GlobalProps['isLogin']>(true);
   const [role, setRole] = useState<GlobalProps['role']>("administrador");
   return (
-    <div>  
-      {isLogin ? <Home isLogin={isLogin} role={role} /> : <Login />}
+    <div>
+      <Header isLogin={isLogin} role={role} />
+      {children}      
     </div>
   );
 }
