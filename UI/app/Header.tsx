@@ -3,7 +3,7 @@ import UserCard from "./components/UserCard";
 
 function Header( {isLogin}) {
   return (
-    <div className="h-20 bg-white flex flex-row items-center justify-between px-5">
+    <div className="h-20 bg-white flex flex-row items-center justify-between px-5 shadow-md">
         <div className="w-15 flex items-center justify-center my-auto">
           <Image src="/logo.png" alt="logo" height={60} width={45} />
         </div>
