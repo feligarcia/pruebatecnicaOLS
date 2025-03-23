@@ -1,66 +1,54 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
 }
 
 datasource db {
   provider = "postgresql"
-  url      = env("DATABASE_URL") // Usa una variable de entorno para la conexión
+  url      = env("DATABASE_URL")
 }
 
-enum RolUsuario {
-  administrador
-  auxiliar
+model comerciante {
+  comid               Int                @id @default(autoincrement())
+  nombre              String             @db.VarChar(255)
+  municipio           String             @db.VarChar(255)
+  telefono            String?            @db.VarChar(255)
+  correo              String?            @db.VarChar(255)
+  fecha_registro      DateTime           @db.Timestamp(6)
+  estado              estado_comerciante
+  fecha_actualizacion DateTime           @default(now()) @db.Timestamp(6)
+  userid              Int
+  usuario             usuario            @relation(fields: [userid], references: [userid], onDelete: SetNull, onUpdate: NoAction)
+  establecimiento     establecimiento[]
 }
 
-enum EstadoComerciante {
+model establecimiento {
+  estid               Int         @id @default(autoincrement())
+  nombre              String      @db.VarChar(255)
+  ingresos            Decimal     @db.Decimal(20, 2)
+  numempleados        Int
+  comid               Int
+  fecha_actualizacion DateTime    @default(now()) @db.Timestamp(6)
+  userid              Int
+  comerciante         comerciante @relation(fields: [comid], references: [comid], onDelete: NoAction, onUpdate: NoAction)
+  usuario             usuario     @relation(fields: [userid], references: [userid], onDelete: SetNull, onUpdate: NoAction)
+}
+
+model usuario {
+  userid          Int               @id @default(autoincrement())
+  nombre          String            @db.VarChar(255)
+  correo          String            @db.VarChar(255)
+  contrasena      String            @db.VarChar(255)
+  rol             rol_usuario
+  comerciante     comerciante[]
+  establecimiento establecimiento[]
+}
+
+enum estado_comerciante {
   activo
   inactivo
 }
 
-model Usuario {
-  userid    Int         @id @default(autoincrement())
-  nombre    String
-  correo    String      @unique
-  contrasena String
-  rol       RolUsuario
-
-  Comerciante Comerciante[] // Relación con Comerciante
-  Establecimiento Establecimiento[] // Relación con Establecimiento
+enum rol_usuario {
+  administrador
+  auxiliar
 }
-
-model Comerciante {
-  comid             Int         @id @default(autoincrement())
-  nombre           String
-  municipio        String
-  telefono         String?
-  correo           String?
-  fecha_registro   DateTime
-  estado           EstadoComerciante
-  fecha_actualizacion DateTime @default(now())
-
-  userid  Int
-  Usuario Usuario @relation(fields: [userid], references: [userid], onDelete: SetNull)
-
-  Establecimiento Establecimiento[] // Relación con Establecimiento
-}
-
-model Establecimiento {
-  estid             Int      @id @default(autoincrement())
-  nombre           String
-  ingresos         Decimal
-  numempleados     Int
-  fecha_actualizacion DateTime @default(now())
-
-  comid  Int
-  comerciante Comerciante @relation(fields: [comid], references: [comid])
-
-  userid  Int
-  Usuario Usuario @relation(fields: [userid], references: [userid], onDelete: SetNull)
-}
-
