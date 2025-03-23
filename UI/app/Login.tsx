@@ -45,6 +45,7 @@ function Login() {
                 type="text"
                 className="w-full px-4 py-2 border border-gray-600 rounded-md text-black focus:ring-2 focus:ring-pink-600"
                 onChange={(e) => setDocument(e.target.value)}
+                required
               />
             </div>
             <div className="relative w-full">
@@ -60,6 +61,7 @@ function Login() {
                 className="w-full px-4 py-2 border border-gray-600 rounded-md text-black focus:ring-2 focus:ring-pink-600"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
+                required
               />
             </div>
 
@@ -70,6 +72,7 @@ function Login() {
                 checked={acceptedTerms}
                 onChange={() => setAcceptedTerms(!acceptedTerms)}
                 className="w-4 h-4"
+                required
               />
               <label htmlFor="terms" className="text-sm text-gray-800">
                 Acepto términos y condiciones

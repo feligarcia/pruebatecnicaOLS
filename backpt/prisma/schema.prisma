@@ -1,0 +1,66 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL") // Usa una variable de entorno para la conexión
+}
+
+enum RolUsuario {
+  administrador
+  auxiliar
+}
+
+enum EstadoComerciante {
+  activo
+  inactivo
+}
+
+model Usuario {
+  userid    Int         @id @default(autoincrement())
+  nombre    String
+  correo    String      @unique
+  contrasena String
+  rol       RolUsuario
+
+  Comerciante Comerciante[] // Relación con Comerciante
+  Establecimiento Establecimiento[] // Relación con Establecimiento
+}
+
+model Comerciante {
+  comid             Int         @id @default(autoincrement())
+  nombre           String
+  municipio        String
+  telefono         String?
+  correo           String?
+  fecha_registro   DateTime
+  estado           EstadoComerciante
+  fecha_actualizacion DateTime @default(now())
+
+  userid  Int
+  Usuario Usuario @relation(fields: [userid], references: [userid], onDelete: SetNull)
+
+  Establecimiento Establecimiento[] // Relación con Establecimiento
+}
+
+model Establecimiento {
+  estid             Int      @id @default(autoincrement())
+  nombre           String
+  ingresos         Decimal
+  numempleados     Int
+  fecha_actualizacion DateTime @default(now())
+
+  comid  Int
+  comerciante Comerciante @relation(fields: [comid], references: [comid])
+
+  userid  Int
+  Usuario Usuario @relation(fields: [userid], references: [userid], onDelete: SetNull)
+}
+
