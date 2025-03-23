@@ -8,13 +8,22 @@ import {
   Put,
   BadRequestException,
   Patch,
+  NotFoundException,
+  UseGuards,
+  Request,
 } from '@nestjs/common';
 import { ComercianteService } from './comerciantes';
 import { comerciante } from '@prisma/client';
+import { AuthGuard } from 'src/usuarios/usuarios.guard';
+import { JwtService } from '@nestjs/jwt';
 
+@UseGuards(AuthGuard)
 @Controller('/comerciantes')
 export class ComerciantesController {
-  constructor(private readonly comercianteservice: ComercianteService) {}
+  constructor(
+    private readonly comercianteservice: ComercianteService,
+    private jwtService: JwtService,
+  ) {}
 
   @Get()
   async getAllComerciantes() {
@@ -22,8 +31,10 @@ export class ComerciantesController {
   }
 
   @Post()
-  async createComerciante(@Body() data: comerciante) {
-    return this.comercianteservice.createComerciante(data);
+  async createComerciante(@Body() data: comerciante, @Request() req) {
+    const [type, token] = (await req.headers.authorization).split(' ') ?? [];
+    const { correo, rol } = this.jwtService.decode(token);
+    return this.comercianteservice.createComerciante(data, correo, rol);
   }
 
   @Get(':id')
@@ -31,7 +42,7 @@ export class ComerciantesController {
     const comFound = await this.comercianteservice.getComercianteById(
       Number(id),
     );
-    if (!comFound) throw new BadRequestException('Comerciante not found');
+    if (!comFound) throw new NotFoundException('Comerciante not found');
     return comFound;
   }
 
@@ -40,25 +51,33 @@ export class ComerciantesController {
     try {
       return await this.comercianteservice.deleteComerciante(Number(id));
     } catch (error) {
-      throw new BadRequestException('Comerciante not found delete');
+      throw new NotFoundException('Comerciante not found delete');
     }
   }
 
   @Put(':id')
-  async updateComerciante(@Param('id') id: string, @Body() data: comerciante) {
+  async updateComerciante(@Param('id') id: string, @Body() data: comerciante, @Request() req) {
+    const [type, token] = (await req.headers.authorization).split(' ') ?? [];
+    const { correo, rol } = this.jwtService.decode(token);
     try {
-      return await this.comercianteservice.updateComerciante(Number(id), data);
+      return await this.comercianteservice.updateComerciante(Number(id), data, correo, rol);
     } catch (error) {
-      throw new BadRequestException('Comerciante not found update');
+      throw new NotFoundException('Comerciante not found update');
     }
   }
 
   @Patch(':id')
-  async updateComerciantePatch(@Param('id') id: string, @Body() data: comerciante) {
+  async updateComerciantePatch(
+    @Param('id') id: string,
+    @Body() data: comerciante,
+    @Request() req
+  ) {
+    const [type, token] = (await req.headers.authorization).split(' ') ?? [];
+    const { correo, rol } = this.jwtService.decode(token);
     try {
-      return await this.comercianteservice.updateComerciante(Number(id), data);
+      return await this.comercianteservice.updateComerciante(Number(id), data, correo,rol);
     } catch (error) {
-      throw new BadRequestException('Comerciante not found update');
+      throw new NotFoundException('Comerciante not found update');
     }
   }
 }

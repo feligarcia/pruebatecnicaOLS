@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { comerciante } from '@prisma/client';
+import { CreateComercianteDto } from './dto/create-comerciante.dto';
 
 @Injectable()
 export class ComercianteService {
@@ -17,18 +18,34 @@ export class ComercianteService {
       },
     });
   }
-  async createComerciante(data: comerciante): Promise<comerciante> {
+  async createComerciante(
+    data: CreateComercianteDto,
+    correo: string,
+    role: string,
+  ): Promise<comerciante> {
+    const user = await this.prisma.usuario.findFirst({
+      where: {
+        correo: correo,
+      },
+    });
+    const comwithid: comerciante = { ...data, userid: Number(user?.userid) };    
     return this.prisma.comerciante.create({
-      data: data,
+      data: comwithid,
     });
   }
 
-  async updateComerciante(id: number, data: comerciante): Promise<comerciante> {
+  async updateComerciante(id: number, data: comerciante, correo: string, role: string): Promise<comerciante> {
+    const user = await this.prisma.usuario.findFirst({
+      where: {
+        correo: correo,
+      },
+    });
+    const comwithid: comerciante = { ...data, userid: Number(user?.userid) };
     return this.prisma.comerciante.update({
       where: {
         comid: id,
       },
-      data: data,
+      data: comwithid,
     });
   }
 

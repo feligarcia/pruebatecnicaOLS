@@ -3,24 +3,37 @@ import {
   Body,
   Controller,
   Get,
+  NotFoundException,
   Param,
+  UnauthorizedException,
+  UseGuards,
+  Request
 } from '@nestjs/common';
 import { usuario } from '@prisma/client';
 import { UsuariosService } from './usuarios';
+import { AuthGuard } from './usuarios.guard';
+import { Public } from './decorators/public.decorator';
 
+@Public()
 @Controller('login')
 export class UsuariosController {
   constructor(private readonly usuarioservice: UsuariosService) {}
 
   @Get()
   async getUser(
-    @Body('userid') userid: string,
+    @Body('correo') correo: string,
     @Body('contrasena') contrasena: string,
-  ): Promise<usuario | null> {
+  ): Promise<{ access_token: string, rol: string } | UnauthorizedException> {
     try {
-      return await this.usuarioservice.getUser(Number(userid), contrasena);
+      return await this.usuarioservice.getUser(correo, contrasena);
     } catch (error) {
-      throw new BadRequestException('User or passdword incorrecto');
+      throw new NotFoundException('correo or passdword incorrecto');
     }
+  }
+
+  @UseGuards(AuthGuard)
+  @Get('profile')
+  getProfile(@Request() req) {
+    return req.user;
   }
 }
