@@ -11,5 +11,8 @@ Consta de 3 carpetas:
 Documentación de la API REST, en una colección postman:
 https://documenter.getpostman.com/view/18839533/2sAYkHoe45
 
-
+BACK:
+- Prueba unitaria en src/comerciantes/comerciantes.spec.ts 
+    Ejecutar prueba unitaria con `npx jest`
+- Dockerfile para generar docker del back
 

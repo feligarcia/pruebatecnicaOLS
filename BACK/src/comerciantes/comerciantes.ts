@@ -28,13 +28,18 @@ export class ComercianteService {
         correo: correo,
       },
     });
-    const comwithid: comerciante = { ...data, userid: Number(user?.userid) };    
+    const comwithid: comerciante = { ...data, userid: Number(user?.userid) };
     return this.prisma.comerciante.create({
       data: comwithid,
     });
   }
 
-  async updateComerciante(id: number, data: comerciante, correo: string, role: string): Promise<comerciante> {
+  async updateComerciante(
+    id: number,
+    data: comerciante,
+    correo: string,
+    role: string,
+  ): Promise<comerciante> {
     const user = await this.prisma.usuario.findFirst({
       where: {
         correo: correo,
@@ -49,11 +54,27 @@ export class ComercianteService {
     });
   }
 
-  async deleteComerciante(id: number): Promise<comerciante> {
-    return this.prisma.comerciante.delete({
-      where: {
-        comid: id,
-      },
-    });
+  async deleteComerciante(id: number, rol: string): Promise<comerciante> {
+    if (rol !== 'administrador')
+      throw new Error('Accion no permitida al usuario');
+    try {
+      const comercianteExistente = await this.prisma.comerciante.findUnique({
+        where: {
+          comid: id,
+        },
+      });
+
+      if (!comercianteExistente) {
+        throw new Error('No existe comerciante con ese id');
+      }
+
+      return this.prisma.comerciante.delete({
+        where: {
+          comid: id,
+        },
+      });
+    } catch (error) {
+      throw new Error(`${error.message}`);
+    }
   }
 }

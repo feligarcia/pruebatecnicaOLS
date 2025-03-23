@@ -47,11 +47,13 @@ export class ComerciantesController {
   }
 
   @Delete(':id')
-  async deleteComerciante(@Param('id') id: string) {
+  async deleteComerciante(@Param('id') id: string, @Request() req) {
+    const [type, token] = (await req.headers.authorization).split(' ') ?? [];
+    const { correo, rol } = this.jwtService.decode(token);
     try {
-      return await this.comercianteservice.deleteComerciante(Number(id));
+      return await this.comercianteservice.deleteComerciante(Number(id), rol);
     } catch (error) {
-      throw new NotFoundException('Comerciante not found delete');
+      throw new NotFoundException(`Error: ${error.message}`);
     }
   }
 
