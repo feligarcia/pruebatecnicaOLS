@@ -5,7 +5,7 @@ services:
     build:
       context: ./DB
       dockerfile: Dockerfile
-    container_name: postgres_container
+    container_name: pruebaDB
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: prueba123
@@ -16,13 +16,13 @@ services:
       - postgres_data:/var/lib/postgresql/data
     restart: always
     networks:
-      - app_network
+      - pruebanet
 
   app:
     build:
       context: ./BACK
       dockerfile: Dockerfile
-    container_name: app_container
+    container_name: pruebaBack
     environment:
       DATABASE_URL: "postgresql://postgres:prueba123@db:5432/felipedb?schema=public"
     depends_on:
@@ -31,10 +31,10 @@ services:
       - "4000:4000"
     command: ["npm", "run", "start:prod"]
     networks:
-      - app_network
+      - pruebanet
 
 volumes:
   postgres_data:
 
 networks:
-  app_network:
+  pruebanet:
