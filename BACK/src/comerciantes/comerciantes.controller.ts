@@ -2,7 +2,6 @@ import {
   Body,
   Controller,
   Delete,
-  Get,
   Param,
   Post,
   Put,
@@ -11,6 +10,7 @@ import {
   NotFoundException,
   UseGuards,
   Request,
+  Get,
 } from '@nestjs/common';
 import { ComercianteService } from './comerciantes';
 import { comerciante } from '@prisma/client';
@@ -58,11 +58,20 @@ export class ComerciantesController {
   }
 
   @Put(':id')
-  async updateComerciante(@Param('id') id: string, @Body() data: comerciante, @Request() req) {
+  async updateComerciante(
+    @Param('id') id: string,
+    @Body() data: comerciante,
+    @Request() req,
+  ) {
     const [type, token] = (await req.headers.authorization).split(' ') ?? [];
     const { correo, rol } = this.jwtService.decode(token);
     try {
-      return await this.comercianteservice.updateComerciante(Number(id), data, correo, rol);
+      return await this.comercianteservice.updateComerciante(
+        Number(id),
+        data,
+        correo,
+        rol,
+      );
     } catch (error) {
       throw new NotFoundException('Comerciante not found update');
     }
@@ -72,12 +81,17 @@ export class ComerciantesController {
   async updateComerciantePatch(
     @Param('id') id: string,
     @Body() data: comerciante,
-    @Request() req
+    @Request() req,
   ) {
     const [type, token] = (await req.headers.authorization).split(' ') ?? [];
     const { correo, rol } = this.jwtService.decode(token);
     try {
-      return await this.comercianteservice.updateComerciante(Number(id), data, correo,rol);
+      return await this.comercianteservice.updateComerciante(
+        Number(id),
+        data,
+        correo,
+        rol,
+      );
     } catch (error) {
       throw new NotFoundException('Comerciante not found update');
     }
