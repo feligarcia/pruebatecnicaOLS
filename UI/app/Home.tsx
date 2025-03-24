@@ -15,6 +15,7 @@ import {
   updateComerciante,
 } from "./api/comerciante";
 import { useRouter } from "next/navigation";
+import { generateAllCSV } from "./api/csv";
 
 // Generar empresas mock
 // const empresas = Array.from({ length: 50 }, (_, i) => ({
@@ -82,7 +83,7 @@ function Home() {
               </button>
             </Link>
             {rol === "administrador" && (
-              <button className="text-pink-600 bg-white border rounded-md p-1 px-2 cursor-pointer">
+              <button className="text-pink-600 bg-white border rounded-md p-1 px-2 cursor-pointer" onClick={() => generateAllCSV(token)}>
                 Descargar Reporte en CSV
               </button>
             )}
