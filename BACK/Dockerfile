@@ -1,29 +1,26 @@
-# Use the official Node.js image as the base image
+# Usa una imagen oficial de Node.js como base
 FROM node:20
 
-# Set the working directory inside the container
+# Establece el directorio de trabajo dentro del contenedor
 WORKDIR /usr/src/app
 
-# Copy package.json and package-lock.json to the working directory
+# Copia archivos necesarios para la instalación
 COPY package*.json ./
 
-# Install the application dependencies
+# Instala las dependencias de la aplicación
 RUN npm install
 
-# Copy the rest of the application files
+# Copia el código de la aplicación
 COPY . .
 
-# Install Prisma CLI globally (if not already installed in your project)
-RUN npm install -g prisma
-
-# Generate Prisma client
+# Genera Prisma Client
 RUN npx prisma generate
 
-# Run Prisma migrations to initialize the database
-RUN npx prisma migrate deploy
+# Compila el código TypeScript
+RUN npm run build
 
-# Expose the application port
+# Exponer el puerto de la aplicación
 EXPOSE 4000
 
-# Command to run the application
-CMD ["node", "dist/main"]
+# Comando para ejecutar la aplicación
+CMD ["node", "dist/main.js"]
