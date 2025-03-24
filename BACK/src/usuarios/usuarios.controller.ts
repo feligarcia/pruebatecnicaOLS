@@ -7,7 +7,8 @@ import {
   Param,
   UnauthorizedException,
   UseGuards,
-  Request
+  Request,
+  Post
 } from '@nestjs/common';
 import { usuario } from '@prisma/client';
 import { UsuariosService } from './usuarios';
@@ -19,7 +20,7 @@ import { Public } from './decorators/public.decorator';
 export class UsuariosController {
   constructor(private readonly usuarioservice: UsuariosService) {}
 
-  @Get()
+  @Post()
   async getUser(
     @Body('correo') correo: string,
     @Body('contrasena') contrasena: string,

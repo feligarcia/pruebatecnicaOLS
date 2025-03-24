@@ -1,16 +1,45 @@
 import React from "react";
-import { useState } from "react";
 import Image from "next/image";
+import { Formik, Form, Field, ErrorMessage } from "formik";
+import * as Yup from "yup";
+import { LoginProps } from "./Login";
+import { getLogin } from "./api/usuario";
+import { useRouter } from "next/navigation";
+import { useAuth } from "./AuthContext";
 
 function Login() {
-  const [document, setDocument] = useState("");
-  const [password, setPassword] = useState("");
-  const [acceptedTerms, setAcceptedTerms] = useState(false);
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    console.log({ document, password, acceptedTerms });
+  const { login } = useAuth();
+  const router = useRouter();
+  const initialValues = {
+    correo: "",
+    contrasena: "",
+    terms: false,
   };
+
+  const validationSchema = Yup.object({
+    correo: Yup.string().email().required("El correo es obligatorio"),
+    contrasena: Yup.string().required("La contraseña es obligatoria"),
+    terms: Yup.boolean().oneOf(
+      [true],
+      "Debes aceptar los términos y condiciones"
+    ),
+  });
+
+  const handleSubmit = async (values: LoginProps) => {
+    await getLogin(values)
+      .then((response) => {
+        if (response.access_token) {
+          // router.push('/form');
+          login(response.rol, response.correo, response.access_token);
+        } else {
+          console.error("Correo o contraseña incorrectos");
+        }
+      })
+      .catch((error) => {
+        console.error("Error:", error);
+      });
+  };
+
   return (
     <div className="relative min-h-screen flex items-center justify-center bg-gray-100">
       <div className="absolute inset-0">
@@ -29,62 +58,81 @@ function Login() {
         </h2>
         <div className="bg-white rounded-lg shadow-lg text-center flex flex-col">
           <p className="text-sm text-gray-600 mb-4 border-b px-8 py-4">
-            Digita tu documento de identidad del propietario o representante
-            legal y la contraseña
+            Digita tu correo electronico del propietario o representante legal y
+            la contraseña
           </p>
-          <form onSubmit={handleSubmit} className="space-y-4 p-8">
-            <div className="relative w-full">
-              <label
-                htmlFor="documento"
-                className="absolute -top-3 left-3 text-sm font-medium text-gray-700  bg-white px-1"
-              >
-                Documento
-              </label>
-              <input
-                id="documento"
-                type="text"
-                className="w-full px-4 py-2 border border-gray-600 rounded-md text-black focus:ring-2 focus:ring-pink-600"
-                onChange={(e) => setDocument(e.target.value)}
-                required
-              />
-            </div>
-            <div className="relative w-full">
-              <label
-                htmlFor="password"
-                className="absolute -top-3 left-3 text-sm font-medium text-gray-700  bg-white px-1"
-              >
-                Contraseña
-              </label>
-              <input
-                id="password"
-                type="password"
-                className="w-full px-4 py-2 border border-gray-600 rounded-md text-black focus:ring-2 focus:ring-pink-600"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-              />
-            </div>
+          <Formik
+            initialValues={initialValues}
+            validationSchema={validationSchema}
+            onSubmit={handleSubmit}
+          >
+            {({ isSubmitting }) => (
+              <Form className="space-y-4 p-8">
+                <div className="relative w-full">
+                  <label
+                    htmlFor="correo"
+                    className="absolute -top-3 left-3 text-sm font-medium text-gray-700 bg-white px-1"
+                  >
+                    Correo electrónico
+                  </label>
+                  <Field
+                    id="correo"
+                    name="correo"
+                    type="email"
+                    className="w-full px-4 py-2 border border-gray-600 rounded-md text-black focus:ring-2 focus:ring-pink-600"
+                  />
+                  <ErrorMessage
+                    name="correo"
+                    component="div"
+                    className="text-red-500 text-sm mt-1"
+                  />
+                </div>
+                <div className="relative w-full">
+                  <label
+                    htmlFor="contrasena"
+                    className="absolute -top-3 left-3 text-sm font-medium text-gray-700 bg-white px-1"
+                  >
+                    Contraseña
+                  </label>
+                  <Field
+                    id="contrasena"
+                    name="contrasena"
+                    type="password"
+                    className="w-full px-4 py-2 border border-gray-600 rounded-md text-black focus:ring-2 focus:ring-pink-600"
+                  />
+                  <ErrorMessage
+                    name="contrasena"
+                    component="div"
+                    className="text-red-500 text-sm mt-1"
+                  />
+                </div>
 
-            <div className="flex items-center gap-2 text-left">
-              <input
-                type="checkbox"
-                id="terms"
-                checked={acceptedTerms}
-                onChange={() => setAcceptedTerms(!acceptedTerms)}
-                className="w-4 h-4"
-                required
-              />
-              <label htmlFor="terms" className="text-sm text-gray-800">
-                Acepto términos y condiciones
-              </label>
-            </div>
-            <button
-              type="submit"
-              className="w-full bg-pink-500 text-white py-2 rounded-md hover:bg-pink-600 transition"
-            >
-              Iniciar sesión
-            </button>
-          </form>
+                <div className="flex items-center gap-2 text-left">
+                  <Field
+                    type="checkbox"
+                    id="terms"
+                    name="terms"
+                    className="w-4 h-4"
+                  />
+                  <label htmlFor="terms" className="text-sm text-gray-800">
+                    Acepto términos y condiciones
+                  </label>
+                </div>
+                <ErrorMessage
+                  name="terms"
+                  component="div"
+                  className="text-red-500 text-sm mt-1"
+                />
+                <button
+                  type="submit"
+                  className="w-full bg-pink-500 text-white py-2 rounded-md hover:bg-pink-600 transition"
+                  disabled={isSubmitting}
+                >
+                  {isSubmitting ? "Cargando..." : "Iniciar sesión"}
+                </button>
+              </Form>
+            )}
+          </Formik>
         </div>
       </div>
     </div>

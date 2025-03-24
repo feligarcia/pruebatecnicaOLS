@@ -1,20 +1,57 @@
 "use client";
 import { ErrorMessage, useFormik } from "formik";
-import { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { object, string, date } from "yup";
+import { createComerciante, getComerciantebyId } from "../../api/comerciante";
+import { useAuth } from "../../AuthContext";
+import { useRouter } from "next/navigation";
 
-function page() {
+function Page({ params }: { params: Promise<{ id: string }> }) {
+  const router = useRouter();
+  const { token, isLogin } = useAuth();
+  useEffect(() => {
+    if (!isLogin) {
+      router.push("/");
+    }
+  }, [isLogin, router]);
+  const { id } = React.use(params);
   const [isLoading, setIsLoading] = useState(false);
-  const formik = useFormik({
-    initialValues: {
-      id: "",
+  const [empresa, setEmpresa] = useState({});
+
+  useEffect(() => {
+    const fetchComerciantesbyID = async () => {
+      if (id === "new") return;
+      setIsLoading(true);
+      if (!token) return;
+      try {
+        const data = await getComerciantebyId(token, id);
+        setEmpresa(data);
+        setIsLoading(false);
+      } catch (error) {
+        setIsLoading(false);
+        console.error("Error trayendo el comerciantes", error);
+      }
+    };
+
+    fetchComerciantesbyID();
+  }, [token, id]);
+  let initialValues = {};
+  if (id === "new") {
+    initialValues = {
       nombre: "",
       municipio: "",
       telefono: "",
       correo: "",
-      fecharegistro: "",
+      fecha_registro: "",
       estado: "",
-    },
+    };
+  } else {
+    initialValues = {
+      ...empresa,
+    };
+  }
+  const formik = useFormik({
+    initialValues: initialValues,
     validationSchema: object({
       nombre: string().required("El nombre es requerido"),
       municipio: string().required("El municipio es requerido"),
@@ -22,14 +59,27 @@ function page() {
       correo: string()
         .email("Correo invalido")
         .required("El correo es requerido"),
-      fecharegistro: date().required("La fecha de registro es requerida"),
+      fecha_registro: date().required("La fecha de registro es requerida"),
       estado: string().oneOf(["activo", "inactivo"]).required(),
     }),
+    enableReinitialize: true,
     onSubmit: async (formData, { resetForm }) => {
-      setIsLoading(true);
-      console.log("Datos enviados:", formData);
-      resetForm();
-      setIsLoading(false);
+      if (id === "new") {
+        const formDataWithUTC = {
+          ...formData,
+          fecha_registro: new Date(formData.fecha_registro).toISOString(), // Convertir a formato UTC
+        };
+        setIsLoading(true);
+        createComerciante(token, formDataWithUTC);
+        resetForm();
+        setIsLoading(false);
+        router.push("/");
+      } else {
+        setIsLoading(true);
+        getComerciantebyId(token, id);
+        resetForm();
+        setIsLoading(false);
+      }
     },
   });
   return (
@@ -162,24 +212,24 @@ function page() {
               </div>
               <div className="relative w-full">
                 <label
-                  htmlFor="fecharegistro"
+                  htmlFor="fecha_registro"
                   className="absolute -top-3 left-3 text-sm font-medium text-gray-700  bg-white px-1"
                 >
                   Fecha de registro
                 </label>
                 <input
                   required
-                  id="fecharegistro"
-                  type="date"
+                  id="fecha_registro"
+                  type="datetime"
                   className="w-full px-4 py-2 border border-gray-600 rounded-md text-black focus:ring-2 focus:ring-pink-600"
                   onChange={formik.handleChange}
                   onBlur={formik.handleBlur}
-                  value={formik.values.fecharegistro}
+                  value={formik.values.fecha_registro}
                 />
-                {formik.touched.fecharegistro &&
-                  formik.errors.fecharegistro && (
+                {formik.touched.fecha_registro &&
+                  formik.errors.fecha_registro && (
                     <div className="text-red-500 text-sm">
-                      {formik.errors.fecharegistro}
+                      {formik.errors.fecha_registro}
                     </div>
                   )}
               </div>
@@ -245,4 +295,4 @@ function page() {
   );
 }
 
-export default page;
+export default Page;

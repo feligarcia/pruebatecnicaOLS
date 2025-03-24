@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   EditIcon,
   CheckIcon,
@@ -7,25 +7,49 @@ import {
   TrashIcon,
   DownloadIcon,
 } from "./components/Icons";
-import { GlobalProps } from "./types";
 import Link from "next/link";
+import { useAuth } from "./AuthContext";
+import { getComerciantes, updateComerciante } from "./api/comerciante";
+import { useRouter } from "next/navigation";
 
-const empresas = Array.from({ length: 50 }, (_, i) => ({
-  id: i + 1,
-  nombre: `Empresa ${i + 1}`,
-  telefono: `+57 ${Math.floor(1000000000 + Math.random() * 900000000)}`,
-  email: `empresa${i + 1}@example.com`,
-  fecha: `2024-06-${String(i + 1).padStart(2, "0")}`,
-  establecimientos: i + 2,
-  estado: i % 3 === 0 ? "Activo" : "Inactivo",
-}));
+// Generar empresas mock
+// const empresas = Array.from({ length: 50 }, (_, i) => ({
+//   id: i + 1,
+//   nombre: `Empresa ${i + 1}`,
+//   telefono: `+57 ${Math.floor(1000000000 + Math.random() * 900000000)}`,
+//   email: `empresa${i + 1}@example.com`,
+//   fecha: `2024-06-${String(i + 1).padStart(2, "0")}`,
+//   establecimientos: i + 2,
+//   estado: i % 3 === 0 ? "Activo" : "Inactivo",
+// }));
 
-export default function Home({ isLogin, role }: GlobalProps) {
+function Home() {
+  const router = useRouter();
+  const { rol, token } = useAuth();
   const [pagina, setPagina] = useState(1);
   const itemsxpage = [5, 10, 15];
   const [itemspagina, setItemsxpage] = useState(5);
   const [isOpen, setIsOpen] = useState(false);
   const [indicepagina, setIndicepagina] = useState(0);
+  const [empresas, setEmpresas] = useState([]);
+  const [isloading, setIsLoading] = useState(false);
+
+  useEffect(() => {
+    const fetchComerciantes = async () => {
+      setIsLoading(true);
+      if (!token) return;
+      try {
+        const data = await getComerciantes(token);
+        setEmpresas(data);
+        setIsLoading(false);
+      } catch (error) {
+        setIsLoading(false);
+        console.error("Error trayendo los comerciantes:", error);
+      }
+    };
+
+    fetchComerciantes();
+  }, [token]);
 
   const handlePageChange = (page: number) => {
     page = Math.max(1, page);
@@ -48,21 +72,21 @@ export default function Home({ isLogin, role }: GlobalProps) {
       <div className="px-15">
         <div className="flex flex-row justify-end align-center mb-4">
           <div>
-            <Link href="/form">
-            <button className="mr-2 bg-pink-600 text-white border rounded-md p-1 px-2 cursor-pointer" >
-              Crear Formulario Nuevo
-            </button>
+            <Link href="/form/new">
+              <button className="mr-2 bg-pink-600 text-white border rounded-md p-1 px-2 cursor-pointer">
+                Crear Formulario Nuevo
+              </button>
             </Link>
-            {role === "administrador" && (
+            {rol === "administrador" && (
               <button className="text-pink-600 bg-white border rounded-md p-1 px-2 cursor-pointer">
                 Descargar Reporte en CSV
               </button>
             )}
           </div>
         </div>
-        <table className="w-full border border-gray-500 border-collapse">
+        <table className="w-full border border-gray-500 border-collapse overflow-scroll">
           <thead className="bg-blue-500 text-white">
-            <tr className="[&>th]:px-4 [&>th]:py-2 border border-gray-500 [&>th]:border [&>th]:border-gray-500">
+            <tr className="[&>th]:px-4 [&>th]:py-2 border border-gray-500 [&>th]:border [&>th]:border-gray-500 text-sm">
               <th>Razón Social</th>
               <th>Teléfono</th>
               <th>Correo Electrónico</th>
@@ -77,18 +101,18 @@ export default function Home({ isLogin, role }: GlobalProps) {
               .slice(indicepagina, indicepagina + itemspagina)
               .map((empresa) => (
                 <tr
-                  key={empresa.id}
-                  className="[&>td]:border [&>td]:border-neutral-300 [&>td]:px-4 [&>td]:py-2 odd:bg-white even:bg-zinc-100"
+                  key={empresa.comid}
+                  className="[&>td]:border [&>td]:border-neutral-300 [&>td]:px-4 [&>td]:py-2 odd:bg-white even:bg-zinc-100 text-sm"
                 >
                   <td>{empresa.nombre}</td>
                   <td>{empresa.telefono}</td>
-                  <td>{empresa.email}</td>
-                  <td>{empresa.fecha}</td>
+                  <td>{empresa.correo}</td>
+                  <td>{empresa.fecha_registro}</td>
                   <td>{empresa.establecimientos}</td>
                   <td>
                     <span
                       className={`px-2 py-1 rounded-full text-sm ${
-                        empresa.estado === "Activo"
+                        empresa.estado === "activo"
                           ? "border border-green-700 text-green-700"
                           : "border border-red-700 text-red-700"
                       }`}
@@ -98,19 +122,72 @@ export default function Home({ isLogin, role }: GlobalProps) {
                   </td>
                   <td>
                     <div className="flex flex-row justify-evenly align-center gap-2">
-                      <button className="hover:opacity-80 cursor-pointer">
+                      <button
+                        className="hover:opacity-80 cursor-pointer"
+                        onClick={async () => {
+                          router.push(`/form/${empresa.comid}/?edit`);
+                        }}
+                      >
                         <EditIcon size={16} />
                       </button>
-                      {empresa.estado === "Activo" ? (
-                        <button className="text-red-600 hover:opacity-80 cursor-pointer">
+                      {empresa.estado === "activo" ? (
+                        <button
+                          className="text-red-600 hover:opacity-80 cursor-pointer"
+                          onClick={async () => {
+                            setIsLoading(true);
+                            updateComerciante(
+                              token,
+                              {
+                                estado:
+                                  empresa.estado === "activo"
+                                    ? "inactivo"
+                                    : "activo",
+                              },
+                              empresa.comid
+                            );
+                            setEmpresas((prevEmpresas) =>
+                              prevEmpresas.map((e) =>
+                                e.comid === empresa.comid
+                                  ? { ...e, estado: e.estado === "activo" ? "inactivo" : "activo" }
+                                  : e
+                              )
+                            );
+                            setIsLoading(false);
+                            router.refresh();
+                          }}
+                        >
                           <CloseIcon size={16} />
                         </button>
                       ) : (
-                        <button className="text-green-600 hover:opacity-80 cursor-pointer">
+                        <button
+                          className="text-green-600 hover:opacity-80 cursor-pointer"
+                          onClick={async () => {
+                            setIsLoading(true);
+                            updateComerciante(
+                              token,
+                              {
+                                estado:
+                                  empresa.estado === "activo"
+                                    ? "inactivo"
+                                    : "activo",
+                              },
+                              empresa.comid
+                            );
+                            setEmpresas((prevEmpresas) =>
+                              prevEmpresas.map((e) =>
+                                e.comid === empresa.comid
+                                  ? { ...e, estado: e.estado === "activo" ? "inactivo" : "activo" }
+                                  : e
+                              )
+                            );
+                            setIsLoading(false);
+                            router.refresh();
+                          }}
+                        >
                           <CheckIcon size={16} />
                         </button>
                       )}
-                      {role === "administrador" && (
+                      {rol === "administrador" && (
                         <button className="text-gray-600 hover:opacity-80 cursor-pointer">
                           <TrashIcon size={16} />
                         </button>
@@ -189,3 +266,4 @@ export default function Home({ isLogin, role }: GlobalProps) {
     </div>
   );
 }
+export default Home;

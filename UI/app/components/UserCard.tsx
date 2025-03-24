@@ -1,11 +1,11 @@
-import { useState } from "react";
 import { LogoutIcon } from "./Icons";
+import { useAuth } from "../AuthContext";
 function UserCard() {
-  const [role, setRole] = useState("Administrador");
-  const [name, setName] = useState("John Doe");
+  const { rol, correo, logout } = useAuth();
+
   return (
     <div className="flex flex-row items-center justify-center space-x-4">
-      <div className="flex items-center justify-center border-2 border-gray-300 rounded-full h-15 w-15">
+      <div className="flex items-center justify-center border-2 border-gray-300 rounded-full h-10 w-10">
         <svg
           xmlns="http://www.w3.org/2000/svg"
           width="30"
@@ -24,11 +24,14 @@ function UserCard() {
         </svg>
       </div>
       <div className="flex flex-col">
-        <h4 className="font-bold text-blue-900">Bienvenido!</h4>
-        <h4>{name}</h4>
-        <h4>{role}</h4>
+        <h4 className="font-bold text-blue-900 text-sm">Bienvenido!</h4>
+        <h4 className="text-sm">{correo}</h4>
+        <h4 className="text-sm">{rol}</h4>
       </div>
-      <div className="cursor-pointer hover:text-red-500">
+      <div
+        className="cursor-pointer hover:text-red-500"
+        onClick={() => logout()}
+      >
         <LogoutIcon />
       </div>
     </div>

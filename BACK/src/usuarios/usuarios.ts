@@ -11,7 +11,7 @@ export class UsuariosService {
   async getUser(
     correo: string,
     contrasena: string,
-  ): Promise<{ access_token: string ; rol: string }> {
+  ): Promise<{ access_token: string; rol: string , correo: string}> {
     try {
       if (!correo || !contrasena) {
         throw new Error('Correo y contraseña son obligatorios');
@@ -32,7 +32,8 @@ export class UsuariosService {
       const payload = { correo: usuario.correo, rol: usuario.rol };
       return {
         access_token: await this.jwtService.signAsync(payload),
-        rol: usuario.rol
+        rol: usuario.rol,
+        correo: usuario.correo,
       };
     } catch (error) {
       throw new UnauthorizedException(`Error en getUser: ${error.message}`);
