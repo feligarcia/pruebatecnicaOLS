@@ -12,8 +12,18 @@ import { useRouter } from "next/navigation";
 import { EmpresaBD } from "@/app/types";
 import { getEstablecimientosAll } from "@/app/api/csv";
 
+interface FormProps {
+  id: string;
+  children?: never; 
+}
+interface Establecimiento {
+  comid: string;
+  totalIngresos: number;
+  totalEmpleados: number;
+}
+
 // function Page({ params }: { params: Promise<{ id: string }> }) {
-function Form({ id }: { id: string }) {
+function Form({ id }: FormProps) {
   const router = useRouter();
   const { token, isLogin } = useAuth();
   useEffect(() => {
@@ -26,7 +36,7 @@ function Form({ id }: { id: string }) {
   // const id = (await params).id;
   const [isLoading, setIsLoading] = useState(false);
   const [empresa, setEmpresa] = useState<EmpresaBD | object>({});
-  const [totales, setTotales] = useState<any>([]);
+  const [totales, setTotales] = useState<Establecimiento[]>([]);
 
   useEffect(() => {
     const fetchComerciantesbyID = async () => {
@@ -108,7 +118,7 @@ function Form({ id }: { id: string }) {
   return (
     <div className="flex flex-col min-h-screen">
       <div className="flex border-b border-gray-300 bg-blue-50">
-        <h2 className="text-lg font-bold text-blue-900 p-4 ">Empresa 1</h2>
+        <h2 className="text-lg font-bold text-blue-900 p-4 ">{isLoading ? 'Cargando...' : empresa.nombre || '...'}</h2>
       </div>
       <div className="bg-blue-200 flex-1">
         <form
@@ -118,10 +128,10 @@ function Form({ id }: { id: string }) {
         >
           <div className="flex border-b border-gray-300">
             <h2 className="text-lg font-bold text-blue-900 p-4 ">
-              Datos generales {isLoading && "Cargando..."}
+              Datos generales
             </h2>
           </div>
-          <div className="text-center flex flex-row py-10 align-center justify-between">
+          {isLoading ? 'Cargando ...' :<div className="text-center flex flex-row py-10 align-center justify-between">
             <div className="flex flex-col gap-6  border-r border-gray-400  justify-start flex-1/2 px-8">
               <div className="relative w-full">
                 <label
@@ -286,7 +296,7 @@ function Form({ id }: { id: string }) {
                 </label>
               </div>
             </div>
-          </div>
+          </div>}
         </form>
       </div>
       <div className="flex flex-row align-center justify-center px-9 bg-blue-200">

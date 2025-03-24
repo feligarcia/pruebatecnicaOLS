@@ -5,10 +5,10 @@ import Login from "./Login";
 
 import { useAuth } from "./AuthContext";
 
-//Pendiente usar redux para manejo global de estado
-
-export default function LoginPage({ children }) {
+function LoginPage() {
   const { isLogin } = useAuth();
 
-  return <div>{isLogin ? <Home /> : <Login />}</div>;
+  return <>{isLogin ? <Home /> : <Login />}</>;
 }
+
+export default LoginPage;

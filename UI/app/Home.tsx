@@ -17,6 +17,16 @@ import {
 import { useRouter } from "next/navigation";
 import { generateAllCSV } from "./api/csv";
 
+
+interface Empresa {
+  comid: string;
+  nombre: string;
+  telefono?: string;
+  correo: string;
+  fecha_registro: string;
+  establecimientos: number;
+  estado: string;
+}
 // Generar empresas mock
 // const empresas = Array.from({ length: 50 }, (_, i) => ({
 //   id: i + 1,
@@ -36,7 +46,7 @@ function Home() {
   const [itemspagina, setItemsxpage] = useState(5);
   const [isOpen, setIsOpen] = useState(false);
   const [indicepagina, setIndicepagina] = useState(0);
-  const [empresas, setEmpresas] = useState([]);
+  const [empresas, setEmpresas] = useState<>([]);
   const [isloading, setIsLoading] = useState(false);
 
   useEffect(() => {
@@ -101,7 +111,7 @@ function Home() {
               <th>Acciones</th>
             </tr>
           </thead>
-          <tbody>
+          { isloading ? 'Cargando ...' : <tbody>
             {empresas
               .slice(indicepagina, indicepagina + itemspagina)
               .map((empresa) => (
@@ -238,7 +248,7 @@ function Home() {
                   </td>
                 </tr>
               ))}
-          </tbody>
+          </tbody>}
         </table>
         <div className="flex flex-row gap-4 pt-4">
           <p>Item:</p>

@@ -4,12 +4,10 @@ import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
 import { LoginProps } from "./Login";
 import { getLogin } from "./api/usuario";
-import { useRouter } from "next/navigation";
 import { useAuth } from "./AuthContext";
 
 function Login() {
   const { login } = useAuth();
-  const router = useRouter();
   const initialValues = {
     correo: "",
     contrasena: "",
