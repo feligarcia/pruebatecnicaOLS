@@ -16,3 +16,10 @@ Para correr el test
 ```bash
 npm run test
 ```
+ # Deplegar en docker
+
+Se crea la imagen
+ `docker build -t backprueba .`
+
+Se crea el contenedor
+  `docker run -p 4000:4000 backprueba`

@@ -13,8 +13,14 @@ RUN npm install
 # Copy the rest of the application files
 COPY . .
 
-# Build the NestJS application
-RUN npm run build
+# Install Prisma CLI globally (if not already installed in your project)
+RUN npm install -g prisma
+
+# Generate Prisma client
+RUN npx prisma generate
+
+# Run Prisma migrations to initialize the database
+RUN npx prisma migrate deploy
 
 # Expose the application port
 EXPOSE 4000
