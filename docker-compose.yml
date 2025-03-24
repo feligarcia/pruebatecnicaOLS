@@ -1,0 +1,33 @@
+version: '3.8'
+
+services:
+  db:
+    build:
+      context: ./DB
+      dockerfile: Dockerfile
+    container_name: postgres_container
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: prueba123
+      POSTGRES_DB: felipedb
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    restart: always
+
+  app:
+    build:
+      context: ./BACK
+      dockerfile: Dockerfile
+    container_name: app_container
+    environment:
+      DATABASE_URL: "postgresql://postgres:prueba123@db:5432/felipedb?schema=public"
+    depends_on:
+      - db
+    ports:
+      - "4000:4000"
+    command: ["npm", "run", "start:prod"]
+
+volumes:
+  postgres_data:

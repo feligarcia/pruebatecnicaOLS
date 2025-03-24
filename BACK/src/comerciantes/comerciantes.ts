@@ -11,7 +11,7 @@ export class ComercianteService {
     return this.prisma.comerciante.findMany();
   }
 
-  async getComercianteById(id: number): Promise<comerciante | null> {
+  async getComercianteById(id: number): Promise<CreateComercianteDto | null> {
     return this.prisma.comerciante.findUnique({
       where: {
         comid: id,
