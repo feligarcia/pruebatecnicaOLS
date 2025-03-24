@@ -1,10 +1,15 @@
 "use client";
-import { ErrorMessage, useFormik } from "formik";
+import { useFormik } from "formik";
 import React, { useEffect, useState } from "react";
 import { object, string, date } from "yup";
-import { createComerciante, getComerciantebyId } from "../../api/comerciante";
+import {
+  createComerciante,
+  getComerciantebyId,
+  updateComerciante,
+} from "../../api/comerciante";
 import { useAuth } from "../../AuthContext";
 import { useRouter } from "next/navigation";
+import { EmpresaBD, newEmpresa } from "@/app/types";
 
 function Page({ params }: { params: Promise<{ id: string }> }) {
   const router = useRouter();
@@ -16,7 +21,7 @@ function Page({ params }: { params: Promise<{ id: string }> }) {
   }, [isLogin, router]);
   const { id } = React.use(params);
   const [isLoading, setIsLoading] = useState(false);
-  const [empresa, setEmpresa] = useState({});
+  const [empresa, setEmpresa] = useState<EmpresaBD | object>({});
 
   useEffect(() => {
     const fetchComerciantesbyID = async () => {
@@ -48,10 +53,14 @@ function Page({ params }: { params: Promise<{ id: string }> }) {
   } else {
     initialValues = {
       ...empresa,
+      fecha_registro: empresa.fecha_registro
+        ? new Date(empresa.fecha_registro).toISOString().slice(0, 16)
+        : "",
     };
   }
-  const formik = useFormik({
-    initialValues: initialValues,
+
+  const formik = useFormik<EmpresaBD>({
+    initialValues: initialValues as EmpresaBD,
     validationSchema: object({
       nombre: string().required("El nombre es requerido"),
       municipio: string().required("El municipio es requerido"),
@@ -67,18 +76,25 @@ function Page({ params }: { params: Promise<{ id: string }> }) {
       if (id === "new") {
         const formDataWithUTC = {
           ...formData,
-          fecha_registro: new Date(formData.fecha_registro).toISOString(), // Convertir a formato UTC
+          fecha_registro: new Date(formData.fecha_registro).toISOString(),
         };
         setIsLoading(true);
         createComerciante(token, formDataWithUTC);
         resetForm();
         setIsLoading(false);
         router.push("/");
+        router.refresh();
       } else {
+        const formDataWithUTC = {
+          ...formData,
+          fecha_registro: new Date(formData.fecha_registro).toISOString(),
+        };
         setIsLoading(true);
-        getComerciantebyId(token, id);
+        updateComerciante(token, formDataWithUTC, id);
         resetForm();
         setIsLoading(false);
+        router.push("/");
+        router.refresh();
       }
     },
   });
@@ -220,7 +236,7 @@ function Page({ params }: { params: Promise<{ id: string }> }) {
                 <input
                   required
                   id="fecha_registro"
-                  type="datetime"
+                  type="datetime-local"
                   className="w-full px-4 py-2 border border-gray-600 rounded-md text-black focus:ring-2 focus:ring-pink-600"
                   onChange={formik.handleChange}
                   onBlur={formik.handleBlur}
@@ -286,7 +302,11 @@ function Page({ params }: { params: Promise<{ id: string }> }) {
               type="submit"
               form="form"
             >
-              Enviar Formulario
+              {isLoading
+                ? "Cargando..."
+                : id === "new"
+                ? "Crear formulario"
+                : "Actualizar formulario"}
             </button>
           </div>
         </div>

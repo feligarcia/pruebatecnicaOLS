@@ -1,3 +1,5 @@
+import { EmpresaBD } from "../types";
+
 const BASEURL = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:4000";
 
 export async function getComerciantes(token: string) {
@@ -12,7 +14,7 @@ export async function getComerciantes(token: string) {
   return await response.json();
 }
 
-export async function updateComerciante(token: string, data: any, id: string) {
+export async function updateComerciante(token: string, data: EmpresaBD, id: string) {
     const response = await fetch(`${BASEURL}/comerciantes/${id}`, {
       method: "PATCH",
       headers: {
@@ -25,7 +27,7 @@ export async function updateComerciante(token: string, data: any, id: string) {
   }
 
 
-  export async function createComerciante(token: string, data: any) {
+  export async function createComerciante(token: string, data: EmpresaBD) {    
     const response = await fetch(`${BASEURL}/comerciantes/`, {
       method: "POST",
       headers: {
@@ -48,3 +50,14 @@ export async function updateComerciante(token: string, data: any, id: string) {
     });
     return await response.json();
   }
+
+    export async function deleteComerciante(token: string, id: string) {
+        const response = await fetch(`${BASEURL}/comerciantes/${id}`, {
+        method: "DELETE",
+        headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+        },
+        });
+        return await response.json();
+    }

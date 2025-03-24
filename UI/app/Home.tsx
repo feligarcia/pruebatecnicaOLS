@@ -9,7 +9,11 @@ import {
 } from "./components/Icons";
 import Link from "next/link";
 import { useAuth } from "./AuthContext";
-import { getComerciantes, updateComerciante } from "./api/comerciante";
+import {
+  deleteComerciante,
+  getComerciantes,
+  updateComerciante,
+} from "./api/comerciante";
 import { useRouter } from "next/navigation";
 
 // Generar empresas mock
@@ -148,7 +152,13 @@ function Home() {
                             setEmpresas((prevEmpresas) =>
                               prevEmpresas.map((e) =>
                                 e.comid === empresa.comid
-                                  ? { ...e, estado: e.estado === "activo" ? "inactivo" : "activo" }
+                                  ? {
+                                      ...e,
+                                      estado:
+                                        e.estado === "activo"
+                                          ? "inactivo"
+                                          : "activo",
+                                    }
                                   : e
                               )
                             );
@@ -176,7 +186,13 @@ function Home() {
                             setEmpresas((prevEmpresas) =>
                               prevEmpresas.map((e) =>
                                 e.comid === empresa.comid
-                                  ? { ...e, estado: e.estado === "activo" ? "inactivo" : "activo" }
+                                  ? {
+                                      ...e,
+                                      estado:
+                                        e.estado === "activo"
+                                          ? "inactivo"
+                                          : "activo",
+                                    }
                                   : e
                               )
                             );
@@ -188,7 +204,28 @@ function Home() {
                         </button>
                       )}
                       {rol === "administrador" && (
-                        <button className="text-gray-600 hover:opacity-80 cursor-pointer">
+                        <button
+                          className="text-gray-600 hover:opacity-80 cursor-pointer"
+                          onClick={async () => {
+                            setIsLoading(true);
+                            try {
+                              await deleteComerciante(token, empresa.comid);
+                              setEmpresas((prevEmpresas) =>
+                                prevEmpresas.filter(
+                                  (e) => e.comid !== empresa.comid
+                                )
+                              );
+                            } catch (error) {
+                              console.error(
+                                "Error eliminando la empresa:",
+                                error
+                              );
+                            } finally {
+                              setIsLoading(false);
+                              router.refresh();
+                            }
+                          }}
+                        >
                           <TrashIcon size={16} />
                         </button>
                       )}
