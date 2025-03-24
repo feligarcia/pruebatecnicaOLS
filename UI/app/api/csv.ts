@@ -22,3 +22,18 @@ export async function generateAllCSV(token: string) {
   a.remove();
   window.URL.revokeObjectURL(url);
 }
+
+export async function getEstablecimientosAll(token: string) {
+  const response = await fetch(`${BASEURL}/csv/establecimientos`, {
+    method: "GET",
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  if (!response.ok) {
+    throw new Error("Error al obtener los establecimientos");
+  }
+
+  return response.json();
+}

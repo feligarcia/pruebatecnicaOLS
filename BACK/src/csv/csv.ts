@@ -51,4 +51,28 @@ export class CsvService {
       console.error('Error generando el archivo CSV:', error);
     }
   }
+
+  async getEstablecimientosAll() {
+    const establecimientos = await this.prisma.comerciante.findMany({
+      include: { establecimiento: true },
+    });
+    const resultados = establecimientos.map((comerciante) => {
+      const totalIngresos = comerciante.establecimiento.reduce(
+        (sum, est) => sum + (est.ingresos ? est.ingresos.toNumber() : 0),
+        0,
+      );
+
+      const totalEmpleados = comerciante.establecimiento.reduce(
+        (sum, est) => sum + (est.numempleados || 0),
+        0,
+      );
+
+      return {
+        comid: comerciante.comid,
+        totalIngresos: totalIngresos.toFixed(0),
+        totalEmpleados,
+      };
+    });
+    return resultados
+  }
 }

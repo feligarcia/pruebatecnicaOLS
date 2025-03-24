@@ -61,4 +61,8 @@ export class CsvController {
       throw new NotFoundException('Error en el csv');
     }
   }
+  @Get('establecimientos')
+  async getEstablecimientosAll() {
+    return await this.csvservice.getEstablecimientosAll();
+  }
 }

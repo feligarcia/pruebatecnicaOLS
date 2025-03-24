@@ -1,0 +1,14 @@
+{
+	"folders": [
+		{
+			"path": "../BACK"
+		},
+		{
+			"path": "."
+		},
+		{
+			"path": "../DB"
+		}
+	],
+	"settings": {}
+}
