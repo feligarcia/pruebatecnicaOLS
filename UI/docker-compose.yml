@@ -1,0 +1,26 @@
+version: '3.8'
+
+services:
+  pruebaui:
+    container_name: pruebauicon
+    image: pruebauiimage
+    build:
+      context: .
+      dockerfile: Dockerfile
+    environment:
+      - NODE_ENV=production
+      - NEXT_TELEMETRY_DISABLED=1
+      - TZ=America/Bogota
+      - PORT=3000
+      - HOSTNAME=0.0.0.0
+    env_file:
+      - .env.example
+    ports:
+      - "3000:3000"
+    restart: unless-stopped
+    user: "nextjs"
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q --spider http://localhost:3000 || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
