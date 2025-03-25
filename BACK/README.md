@@ -16,8 +16,11 @@ npm run test
 ```
 ## Deplegar en docker
 
+Cambia .env a .env.example
+`mv .env.example .env`
+
 Se crea la imagen
- `docker build -t pruebaBack .`
+ `docker build -t pruebaback .`
 
 Se crea el contenedor
-  `docker run -p 4000:4000 pruebaBack`
+  `docker run -p 4000:4000 pruebaback`

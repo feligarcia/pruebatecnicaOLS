@@ -1,5 +1,8 @@
 ## Pasos para generar imagen y contenedor
 
+Cambia .env a .env.example
+`mv .env.example .env`
+
 Genera la imagen
 `docker build -t pruebadbimage .`
 

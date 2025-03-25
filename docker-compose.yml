@@ -5,7 +5,8 @@ services:
     build:
       context: ./DB
       dockerfile: Dockerfile
-    container_name: pruebaDB
+    container_name: pruebadbcon
+    image: pruebadbimage
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: prueba123
@@ -15,6 +16,11 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
     restart: always
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
     networks:
       - pruebanet
 
@@ -22,19 +28,23 @@ services:
     build:
       context: ./BACK
       dockerfile: Dockerfile
-    container_name: pruebaBack
+    container_name: pruebabackcon
+    image: pruebabackimage
     environment:
       DATABASE_URL: "postgresql://postgres:prueba123@db:5432/felipedb?schema=public"
     depends_on:
-      - db
+      db:
+        condition: service_healthy
     ports:
       - "4000:4000"
-    command: ["npm", "run", "start:prod"]
+    command: ["sh", "-c", "sleep 10 && npm run start:prod"]
     networks:
       - pruebanet
 
 volumes:
   postgres_data:
+    name: datapruebadb
 
 networks:
   pruebanet:
+    name: pruebanet
