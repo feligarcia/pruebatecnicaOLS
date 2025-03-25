@@ -3,10 +3,10 @@ version: '3.8'
 services:
   pruebaui:
     container_name: pruebauicon
-    image: pruebauiimage
     build:
       context: .
       dockerfile: Dockerfile
+    image: pruebauimage
     environment:
       - NODE_ENV=production
       - NEXT_TELEMETRY_DISABLED=1
