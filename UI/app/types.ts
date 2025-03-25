@@ -6,6 +6,11 @@ export interface GlobalProps {
   role: rol_usuario["role"];
 }
 
+export interface FormProps {
+  id: string;
+  children?: never; 
+}
+
 export interface newEmpresa {
   nombre: string;
   municipio: string;
@@ -27,3 +32,40 @@ export interface EmpresaBD {
   userid?: number;
 }
 
+export interface getEmpresas {
+  comid?: number;
+  nombre: string;
+  municipio: string;
+  telefono?: string;
+  correo?: string;
+  fecha_registro: string; 
+  estado: "activo" | "inactivo";
+  fecha_actualizacion?: string; 
+  userid?: number;
+  establecimientos?: []
+}
+
+export interface updateEmpresa {
+  comid?: number;
+  nombre?: string;
+  municipio?: string;
+  telefono?: string;
+  correo?: string;
+  fecha_registro?: string; 
+  estado?: "activo" | "inactivo";
+  fecha_actualizacion?: string; 
+  userid?: number;
+  establecimientos?: []
+}
+
+export interface Establecimiento {
+  comid: string;
+  totalIngresos: number;
+  totalEmpleados: number;
+}
+
+export interface LoginProps {
+  correo: string;
+ contrasena: string;
+ terms: boolean;
+}

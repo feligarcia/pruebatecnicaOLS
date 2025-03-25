@@ -1,4 +1,4 @@
-import { LoginProps } from "../Login";
+import { LoginProps } from "../types";
 
 const BASEURL = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:4000';
 

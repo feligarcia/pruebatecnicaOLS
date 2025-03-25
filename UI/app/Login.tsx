@@ -2,9 +2,9 @@ import React from "react";
 import Image from "next/image";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
-import { LoginProps } from "./Login";
 import { getLogin } from "./api/usuario";
 import { useAuth } from "./AuthContext";
+import { LoginProps } from "./types";
 
 function Login() {
   const { login } = useAuth();

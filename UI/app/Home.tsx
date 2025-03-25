@@ -16,17 +16,10 @@ import {
 } from "./api/comerciante";
 import { useRouter } from "next/navigation";
 import { generateAllCSV } from "./api/csv";
+import { getEmpresas } from "./types";
 
 
-interface Empresa {
-  comid: string;
-  nombre: string;
-  telefono?: string;
-  correo: string;
-  fecha_registro: string;
-  establecimientos: number;
-  estado: string;
-}
+
 // Generar empresas mock
 // const empresas = Array.from({ length: 50 }, (_, i) => ({
 //   id: i + 1,
@@ -46,7 +39,7 @@ function Home() {
   const [itemspagina, setItemsxpage] = useState(5);
   const [isOpen, setIsOpen] = useState(false);
   const [indicepagina, setIndicepagina] = useState(0);
-  const [empresas, setEmpresas] = useState<>([]);
+  const [empresas, setEmpresas] = useState<getEmpresas[]>([]);
   const [isloading, setIsLoading] = useState(false);
 
   useEffect(() => {
@@ -123,7 +116,7 @@ function Home() {
                   <td>{empresa.telefono}</td>
                   <td>{empresa.correo}</td>
                   <td>{empresa.fecha_registro}</td>
-                  <td>{empresa.establecimientos}</td>
+                  <td>{empresa.establecimientos || ''}</td>
                   <td>
                     <span
                       className={`px-2 py-1 rounded-full text-sm ${
@@ -158,7 +151,7 @@ function Home() {
                                     ? "inactivo"
                                     : "activo",
                               },
-                              empresa.comid
+                              String(empresa.comid!)
                             );
                             setEmpresas((prevEmpresas) =>
                               prevEmpresas.map((e) =>
@@ -192,7 +185,7 @@ function Home() {
                                     ? "inactivo"
                                     : "activo",
                               },
-                              empresa.comid
+                              String(empresa.comid!)
                             );
                             setEmpresas((prevEmpresas) =>
                               prevEmpresas.map((e) =>
@@ -220,7 +213,7 @@ function Home() {
                           onClick={async () => {
                             setIsLoading(true);
                             try {
-                              await deleteComerciante(token, empresa.comid);
+                              await deleteComerciante(token, String(empresa.comid!));
                               setEmpresas((prevEmpresas) =>
                                 prevEmpresas.filter(
                                   (e) => e.comid !== empresa.comid

@@ -9,19 +9,12 @@ import {
 } from "../../api/comerciante";
 import { useAuth } from "../../AuthContext";
 import { useRouter } from "next/navigation";
-import { EmpresaBD } from "@/app/types";
+import { EmpresaBD, Establecimiento, FormProps } from "@/app/types";
 import { getEstablecimientosAll } from "@/app/api/csv";
 
-interface FormProps {
-  id: string;
-  children?: never; 
-}
-interface Establecimiento {
-  comid: string;
-  totalIngresos: number;
-  totalEmpleados: number;
-}
 
+
+// verificar este cambio de nextjs de los params
 // function Page({ params }: { params: Promise<{ id: string }> }) {
 function Form({ id }: FormProps) {
   const router = useRouter();
@@ -32,10 +25,20 @@ function Form({ id }: FormProps) {
     }
   }, [isLogin, router]);
 
-//   const { id } = use(params);
+  //   const { id } = use(params);
   // const id = (await params).id;
+
+
+
   const [isLoading, setIsLoading] = useState(false);
-  const [empresa, setEmpresa] = useState<EmpresaBD | object>({});
+  const [empresa, setEmpresa] = useState<EmpresaBD>({
+    nombre: "",
+    municipio: "",
+    telefono: "",
+    correo: "",
+    fecha_registro: "",
+    estado: "inactivo",
+  });
   const [totales, setTotales] = useState<Establecimiento[]>([]);
 
   useEffect(() => {
@@ -131,7 +134,7 @@ function Form({ id }: FormProps) {
               Datos generales
             </h2>
           </div>
-          {isLoading ? 'Cargando ...' :<div className="text-center flex flex-row py-10 align-center justify-between">
+          {isLoading ? 'Cargando ...' : <div className="text-center flex flex-row py-10 align-center justify-between">
             <div className="flex flex-col gap-6  border-r border-gray-400  justify-start flex-1/2 px-8">
               <div className="relative w-full">
                 <label
@@ -166,9 +169,9 @@ function Form({ id }: FormProps) {
                   id="departamento"
                   type="text"
                   className="w-full px-4 py-2 border border-gray-600 rounded-md text-black focus:ring-2 focus:ring-pink-600"
-                  //   onChange={formik.handleChange}
-                  //   onBlur={formik.handleBlur}
-                  //   value={formik.values.departamento}
+                //   onChange={formik.handleChange}
+                //   onBlur={formik.handleBlur}
+                //   value={formik.values.departamento}
                 />
                 {/* {formik.touched.nombre && formik.errors.nombre && (
                   <div className="text-red-500 text-sm">
@@ -305,15 +308,21 @@ function Form({ id }: FormProps) {
             <p className="text-white text-sm">Total ingresos formulario:</p>
             <p className=" text-blue-300 font-bold">
               $
-              {totales.find((est) => est.comid === empresa.comid)
-                ?.totalIngresos || 0}
+              {
+                !empresa.comid
+                  ? 0
+                  : totales.find((est) => String(est.comid) === String(empresa.comid))?.totalIngresos || 0
+              }
             </p>
           </div>
           <div className="flex flex-col justify-center">
             <p className="text-white text-sm">Cantidad empleados:</p>
             <p className=" text-blue-300 font-bold">
-              {totales.find((est) => est.comid === empresa.comid)
-                ?.totalEmpleados || 0}
+            {
+                !empresa.comid
+                  ? 0
+                  : totales.find((est) => String(est.comid) === String(empresa.comid))?.totalEmpleados || 0
+              }
             </p>
           </div>
           <div className="flex flex-row flex-1 border border-gray-600 rounded-md gap-1 justify-center align-center my-4">
@@ -328,8 +337,8 @@ function Form({ id }: FormProps) {
               {isLoading
                 ? "Cargando..."
                 : id === "new"
-                ? "Crear formulario"
-                : "Actualizar formulario"}
+                  ? "Crear formulario"
+                  : "Actualizar formulario"}
             </button>
           </div>
         </div>

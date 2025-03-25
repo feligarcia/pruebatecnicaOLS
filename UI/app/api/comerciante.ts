@@ -1,4 +1,4 @@
-import { EmpresaBD } from "../types";
+import { EmpresaBD, updateEmpresa } from "../types";
 
 const BASEURL = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:4000";
 
@@ -14,7 +14,7 @@ export async function getComerciantes(token: string) {
   return await response.json();
 }
 
-export async function updateComerciante(token: string, data: EmpresaBD, id: string) {
+export async function updateComerciante(token: string, data: updateEmpresa, id: string) {
     const response = await fetch(`${BASEURL}/comerciantes/${id}`, {
       method: "PATCH",
       headers: {
