@@ -44,10 +44,10 @@ function Login() {
         <Image
           src="/background.jpg"
           alt="Background"
-          layout="fill"
-          objectFit="cover"
-          className="opacity-80"
+          fill
+          className="object-cover opacity-80"
         />
+
       </div>
 
       <div className="relative shadow-lg w-96 text-center">
