@@ -6,7 +6,6 @@ export enum RolUsuario {
 }
 
 export class UserDto {
-
     @IsNumber()
     @IsInt()
     userid: number;
@@ -16,11 +15,11 @@ export class UserDto {
     @MaxLength(255)
     nombre: string;
 
+    @IsNotEmpty()
     @IsEmail()
-    @IsString()
     correo: string;
 
-    @IsString()
+    @IsNotEmpty()
     @MinLength(6)
     @MaxLength(255)
     contrasena: string;
