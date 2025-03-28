@@ -1,7 +1,8 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { comerciante } from '@prisma/client';
 import { CreateComercianteDto } from './dto/create-comerciante.dto';
+import { error } from 'console';
 
 @Injectable()
 export class ComercianteService {
@@ -12,11 +13,13 @@ export class ComercianteService {
   }
 
   async getComercianteById(id: number): Promise<CreateComercianteDto | null> {
-    return this.prisma.comerciante.findUnique({
+    const comfound = this.prisma.comerciante.findUnique({
       where: {
         comid: id,
       },
     });
+    if(!comfound) throw new NotFoundException(`Comerciante con ${id} no encontrado`)
+      return comfound
   }
   async createComerciante(
     data: CreateComercianteDto,
@@ -28,6 +31,7 @@ export class ComercianteService {
         correo: correo,
       },
     });
+    if(!user) throw new NotFoundException(`Usuario no existe ${correo}, acción invalida`)
     const comwithid: comerciante = { ...data, userid: Number(user?.userid) };
     return this.prisma.comerciante.create({
       data: comwithid,
@@ -45,13 +49,16 @@ export class ComercianteService {
         correo: correo,
       },
     });
+    if(!user) throw new NotFoundException(`Usuario no existe ${correo}, acción invalida`)
     const comwithid: comerciante = { ...data, userid: Number(user?.userid) };
-    return this.prisma.comerciante.update({
+    const comfound = this.prisma.comerciante.update({
       where: {
         comid: id,
       },
       data: comwithid,
     });
+    if(!comfound) throw new NotFoundException(`Comerciante con ${id} no encontrado`)
+      return comfound
   }
 
   async deleteComerciante(id: number, rol: string): Promise<comerciante> {
@@ -65,7 +72,7 @@ export class ComercianteService {
       });
 
       if (!comercianteExistente) {
-        throw new Error('No existe comerciante con ese id');
+        throw new NotFoundException(`Comerciante con ${id} no existe`)
       }
 
       return this.prisma.comerciante.delete({

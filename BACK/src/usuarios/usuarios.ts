@@ -1,33 +1,32 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { JwtService } from '@nestjs/jwt';
+import { LoginUserDto } from './dto/usuarios.dto';
+
 @Injectable()
 export class UsuariosService {
   constructor(
     private prisma: PrismaService,
     private jwtService: JwtService,
-  ) {}
+  ) { }
 
   async getUser(
-    correo: string,
-    contrasena: string,
-  ): Promise<{ access_token: string; rol: string , correo: string}> {
+    login: LoginUserDto
+  ): Promise<{ access_token: string; rol: string, correo: string }> {
     try {
-      if (!correo || !contrasena) {
-        throw new Error('Correo y contraseña son obligatorios');
-      }
+
       const usuario = await this.prisma.usuario.findFirst({
         where: {
-          correo: correo,
+          correo: login.correo,
         },
       });
 
       if (!usuario) {
-        throw new UnauthorizedException('Usuario no encontrado');
+        throw new NotFoundException('Usuario no encontrado');
       }
       //lo ideal es hashear con bcrypt, si da el tiempo lo hago
-      if (usuario.contrasena !== contrasena) {
-        throw new UnauthorizedException('user or password incorrecto');
+      if (usuario.contrasena !== login.contrasena) {
+        throw new NotFoundException('user or password incorrecto');
       }
       const payload = { correo: usuario.correo, rol: usuario.rol };
       return {
