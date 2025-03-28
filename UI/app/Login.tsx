@@ -5,6 +5,7 @@ import * as Yup from "yup";
 import { getLogin } from "./api/usuario";
 import { useAuth } from "./AuthContext";
 import { LoginProps } from "./types";
+import Loader from "./components/Loader";
 
 function Login() {
   const { login } = useAuth();
@@ -126,7 +127,7 @@ function Login() {
                   className="w-full bg-pink-500 text-white py-2 rounded-md hover:bg-pink-600 transition"
                   disabled={isSubmitting}
                 >
-                  {isSubmitting ? "Cargando..." : "Iniciar sesión"}
+                  {isSubmitting ? <Loader color="bg-neutral-50"/> : "Iniciar sesión"}
                 </button>
               </Form>
             )}

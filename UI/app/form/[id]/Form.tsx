@@ -11,6 +11,7 @@ import { useAuth } from "../../AuthContext";
 import { useRouter } from "next/navigation";
 import { EmpresaBD, Establecimiento, FormProps } from "@/app/types";
 import { getEstablecimientosAll } from "@/app/api/csv";
+import Loader from "@/app/components/Loader";
 
 
 
@@ -31,6 +32,7 @@ function Form({ id }: FormProps) {
 
 
   const [isLoading, setIsLoading] = useState(false);
+  const [send, setSend] = useState(false)
   const [empresa, setEmpresa] = useState<EmpresaBD>({
     nombre: "",
     municipio: "",
@@ -98,10 +100,10 @@ function Form({ id }: FormProps) {
           ...formData,
           fecha_registro: new Date(formData.fecha_registro).toISOString(),
         };
-        setIsLoading(true);
-        createComerciante(token, formDataWithUTC);
+        setSend(true);
+        await createComerciante(token, formDataWithUTC);
         resetForm();
-        setIsLoading(false);
+        setSend(false);
         router.push("/");
         router.refresh();
       } else {
@@ -109,10 +111,10 @@ function Form({ id }: FormProps) {
           ...formData,
           fecha_registro: new Date(formData.fecha_registro).toISOString(),
         };
-        setIsLoading(true);
-        updateComerciante(token, formDataWithUTC, id);
+        setSend(true);
+        await updateComerciante(token, formDataWithUTC, id);
         resetForm();
-        setIsLoading(false);
+        setSend(false);
         router.push("/");
         router.refresh();
       }
@@ -121,7 +123,7 @@ function Form({ id }: FormProps) {
   return (
     <div className="flex flex-col min-h-screen">
       <div className="flex border-b border-gray-300 bg-blue-50">
-        <h2 className="text-lg font-bold text-blue-900 p-4 ">{isLoading ? 'Cargando...' : empresa.nombre || '...'}</h2>
+        <h2 className="text-lg font-bold text-blue-900 p-4 ">{isLoading ? <Loader /> : empresa.nombre || '...'}</h2>
       </div>
       <div className="bg-blue-200 flex-1">
         <form
@@ -134,7 +136,7 @@ function Form({ id }: FormProps) {
               Datos generales
             </h2>
           </div>
-          {isLoading ? 'Cargando ...' : <div className="text-center flex flex-row py-10 align-center justify-between">
+          {isLoading ? <Loader /> : <div className="text-center flex flex-row py-10 align-center justify-between">
             <div className="flex flex-col gap-6  border-r border-gray-400  justify-start flex-1/2 px-8">
               <div className="relative w-full">
                 <label
@@ -334,8 +336,8 @@ function Form({ id }: FormProps) {
               type="submit"
               form="form"
             >
-              {isLoading
-                ? "Cargando..."
+              {send
+                ? <Loader color='bg-neutral-50'/>
                 : id === "new"
                   ? "Crear formulario"
                   : "Actualizar formulario"}

@@ -16,7 +16,8 @@ import {
 } from "./api/comerciante";
 import { useRouter } from "next/navigation";
 import { generateAllCSV } from "./api/csv";
-import { getEmpresas } from "./types";
+import { getEmpresas, updateEmpresa } from "./types";
+import Loader from "./components/Loader";
 
 
 
@@ -70,6 +71,66 @@ function Home() {
     setIsOpen(!isOpen);
   };
 
+  const handleStatusChange = async (empresa: updateEmpresa) => {
+    try {
+      setIsLoading(true);
+      await updateComerciante(
+        token,
+        {
+          estado:
+            empresa.estado === "activo"
+              ? "inactivo"
+              : "activo",
+        },
+        String(empresa.comid!)
+      );
+
+      setEmpresas((prevEmpresas) =>
+        prevEmpresas.map((e) =>
+          e.comid === empresa.comid
+            ? {
+              ...e,
+              estado:
+                e.estado === "activo"
+                  ? "inactivo"
+                  : "activo",
+            }
+            : e
+        )
+      );
+      setIsLoading(false);
+      router.refresh();
+    } catch (error) {
+      setIsLoading(false);
+      // Para revertir el cambio de estilo
+      // setEmpresas((prevEmpresas) =>
+      //   prevEmpresas.map((e) =>
+      //     e.comid === empresa.comid ? empresa : e
+      //   )
+      // );   
+      router.refresh();
+      console.error("Error al actualizar comerciante:", error);
+    }
+  }
+  const handleDeleteComercio = async (empresa: updateEmpresa) => {
+    setIsLoading(true);
+    try {
+      await deleteComerciante(token, String(empresa.comid!));
+      setEmpresas((prevEmpresas) =>
+        prevEmpresas.filter(
+          (e) => e.comid !== empresa.comid
+        )
+      );
+    } catch (error) {
+      console.error(
+        "Error eliminando la empresa:",
+        error
+      );
+    } finally {
+      setIsLoading(false);
+      router.refresh();
+    }
+  }
   return (
     <div className="flex flex-col gap-4">
       <div className="flex border-b border-gray-300">
@@ -104,7 +165,7 @@ function Home() {
               <th>Acciones</th>
             </tr>
           </thead>
-          { isloading ? 'Cargando ...' : <tbody>
+          {isloading ? <tbody><tr><td><Loader /></td></tr></tbody> : <tbody>
             {empresas
               .slice(indicepagina, indicepagina + itemspagina)
               .map((empresa) => (
@@ -119,11 +180,10 @@ function Home() {
                   <td>{empresa.establecimientos || ''}</td>
                   <td>
                     <span
-                      className={`px-2 py-1 rounded-full text-sm ${
-                        empresa.estado === "activo"
-                          ? "border border-green-700 text-green-700"
-                          : "border border-red-700 text-red-700"
-                      }`}
+                      className={`px-2 py-1 rounded-full text-sm ${empresa.estado === "activo"
+                        ? "border border-green-700 text-green-700"
+                        : "border border-red-700 text-red-700"
+                        }`}
                     >
                       {empresa.estado}
                     </span>
@@ -141,68 +201,14 @@ function Home() {
                       {empresa.estado === "activo" ? (
                         <button
                           className="text-red-600 hover:opacity-80 cursor-pointer"
-                          onClick={async () => {
-                            setIsLoading(true);
-                            updateComerciante(
-                              token,
-                              {
-                                estado:
-                                  empresa.estado === "activo"
-                                    ? "inactivo"
-                                    : "activo",
-                              },
-                              String(empresa.comid!)
-                            );
-                            setEmpresas((prevEmpresas) =>
-                              prevEmpresas.map((e) =>
-                                e.comid === empresa.comid
-                                  ? {
-                                      ...e,
-                                      estado:
-                                        e.estado === "activo"
-                                          ? "inactivo"
-                                          : "activo",
-                                    }
-                                  : e
-                              )
-                            );
-                            setIsLoading(false);
-                            router.refresh();
-                          }}
+                          onClick={() => handleStatusChange(empresa)}
                         >
                           <CloseIcon size={16} />
                         </button>
                       ) : (
                         <button
                           className="text-green-600 hover:opacity-80 cursor-pointer"
-                          onClick={async () => {
-                            setIsLoading(true);
-                            updateComerciante(
-                              token,
-                              {
-                                estado:
-                                  empresa.estado === "activo"
-                                    ? "inactivo"
-                                    : "activo",
-                              },
-                              String(empresa.comid!)
-                            );
-                            setEmpresas((prevEmpresas) =>
-                              prevEmpresas.map((e) =>
-                                e.comid === empresa.comid
-                                  ? {
-                                      ...e,
-                                      estado:
-                                        e.estado === "activo"
-                                          ? "inactivo"
-                                          : "activo",
-                                    }
-                                  : e
-                              )
-                            );
-                            setIsLoading(false);
-                            router.refresh();
-                          }}
+                          onClick={() => handleStatusChange(empresa)}
                         >
                           <CheckIcon size={16} />
                         </button>
@@ -210,25 +216,7 @@ function Home() {
                       {rol === "administrador" && (
                         <button
                           className="text-gray-600 hover:opacity-80 cursor-pointer"
-                          onClick={async () => {
-                            setIsLoading(true);
-                            try {
-                              await deleteComerciante(token, String(empresa.comid!));
-                              setEmpresas((prevEmpresas) =>
-                                prevEmpresas.filter(
-                                  (e) => e.comid !== empresa.comid
-                                )
-                              );
-                            } catch (error) {
-                              console.error(
-                                "Error eliminando la empresa:",
-                                error
-                              );
-                            } finally {
-                              setIsLoading(false);
-                              router.refresh();
-                            }
-                          }}
+                          onClick={() => handleDeleteComercio(empresa)}
                         >
                           <TrashIcon size={16} />
                         </button>
