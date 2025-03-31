@@ -15,8 +15,6 @@ import Loader from "@/app/components/Loader";
 
 
 
-// verificar este cambio de nextjs de los params
-// function Page({ params }: { params: Promise<{ id: string }> }) {
 function Form({ id }: FormProps) {
   const router = useRouter();
   const { token, isLogin } = useAuth();
@@ -26,8 +24,6 @@ function Form({ id }: FormProps) {
     }
   }, [isLogin, router]);
 
-  //   const { id } = use(params);
-  // const id = (await params).id;
 
 
 
@@ -123,7 +119,7 @@ function Form({ id }: FormProps) {
   return (
     <div className="flex flex-col min-h-screen">
       <div className="flex border-b border-gray-300 bg-blue-50">
-        <h2 className="text-lg font-bold text-blue-900 p-4 ">{isLoading ? <Loader /> : empresa.nombre || '...'}</h2>
+        <h2 className="text-lg font-bold text-blue-900 p-4 ">{isLoading ? <Loader /> : empresa.nombre || 'Nuevo comerciante'}</h2>
       </div>
       <div className="bg-blue-200 flex-1">
         <form

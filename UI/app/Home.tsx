@@ -42,6 +42,7 @@ function Home() {
   const [indicepagina, setIndicepagina] = useState(0);
   const [empresas, setEmpresas] = useState<getEmpresas[]>([]);
   const [isloading, setIsLoading] = useState(false);
+  const [isupdating, setIsUpdating] = useState(false);
 
   useEffect(() => {
     const fetchComerciantes = async () => {
@@ -73,7 +74,7 @@ function Home() {
 
   const handleStatusChange = async (empresa: updateEmpresa) => {
     try {
-      setIsLoading(true);
+      setIsUpdating(true);
       await updateComerciante(
         token,
         {
@@ -98,10 +99,10 @@ function Home() {
             : e
         )
       );
-      setIsLoading(false);
+      setIsUpdating(false);
       router.refresh();
     } catch (error) {
-      setIsLoading(false);
+      setIsUpdating(false);
       // Para revertir el cambio de estilo
       // setEmpresas((prevEmpresas) =>
       //   prevEmpresas.map((e) =>
@@ -200,14 +201,18 @@ function Home() {
                       </button>
                       {empresa.estado === "activo" ? (
                         <button
-                          className="text-red-600 hover:opacity-80 cursor-pointer"
+                        className={`text-red-600 hover:opacity-80 cursor-pointer ${
+                          isupdating ? "animate-pulse text-gray-400" : ""
+                        }`}
                           onClick={() => handleStatusChange(empresa)}
                         >
                           <CloseIcon size={16} />
                         </button>
                       ) : (
                         <button
-                          className="text-green-600 hover:opacity-80 cursor-pointer"
+                        className={`text-green-600 hover:opacity-80 cursor-pointer ${
+                          isupdating ? "animate-pulse text-gray-400" : ""
+                        }`}
                           onClick={() => handleStatusChange(empresa)}
                         >
                           <CheckIcon size={16} />
