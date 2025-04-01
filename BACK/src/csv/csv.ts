@@ -67,10 +67,13 @@ export class CsvService {
         0,
       );
 
+      const totalEstablecimientos = comerciante.establecimiento.length;
+
       return {
         comid: comerciante.comid,
         totalIngresos: totalIngresos.toFixed(0),
         totalEmpleados,
+        totalEstablecimientos,
       };
     });
     return resultados

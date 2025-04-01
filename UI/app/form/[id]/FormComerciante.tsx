@@ -85,9 +85,10 @@ function FormComerciante({ id }: FormProps) {
 
   const handleSubmit = async (formData: EmpresaBD, { resetForm }: { resetForm: () => void }) => {
     setSend(true)
+    const { departamento, ...formNoDepa } = formData
     const formDataWithUTC = {
-      ...formData,
-      fecha_registro: new Date(formData.fecha_registro).toISOString(),
+      ...formNoDepa,
+      fecha_registro: new Date(formNoDepa.fecha_registro).toISOString(),
     };
 
     try {
@@ -159,27 +160,8 @@ function FormComerciante({ id }: FormProps) {
                         <ErrorMessage name="nombre" component="div" className="text-red-500 text-sm mt-1" />
                       </div>
 
-
-
                       <DepartamentosField name='departamento' label='Departamento' />
                       <MunicipiosField name='municipio' label='Municipio' token={token} />
-
-                      <div className="relative w-full">
-                        <label
-                          htmlFor="municipio"
-                          className="absolute -top-3 left-3 text-sm font-medium text-gray-700 bg-white px-1"
-                        >
-                          Municipio
-                        </label>
-                        <Field
-                          required
-                          id="municipio"
-                          name="municipio"
-                          type="text"
-                          className="w-full px-4 py-2 border border-gray-600 rounded-md text-black focus:ring-2 focus:ring-pink-600"
-                        />
-                        <ErrorMessage name="municipio" component="div" className="text-red-500 text-sm mt-1" />
-                      </div>
 
                       <div className="relative w-full">
                         <label
@@ -255,12 +237,16 @@ function FormComerciante({ id }: FormProps) {
                       </div>
 
                       <div className="flex items-center gap-2 text-left">
-                        {/* Considera manejar este checkbox con Formik también si su valor debe guardarse */}
-                        <Field type="checkbox" id="conestableci" name="posee_establecimientos" className="w-4 h-4" />
+                        <Field type="checkbox" id="conestableci" className="w-4 h-4" disabled
+                          checked={!empresa.comid
+                            ? false
+                            : Boolean(totales.find((est) => String(est.comid) === String(empresa.comid))?.totalEstablecimientos) || false}
+                        />
+
                         <label htmlFor="conestableci" className="text-sm text-gray-800">
                           Posee establecimientos?
                         </label>
-                        {/* Añadir ErrorMessage si es necesario */}
+
                       </div>
                     </div>
                   </div>

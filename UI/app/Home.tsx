@@ -43,6 +43,7 @@ function Home() {
   const [empresas, setEmpresas] = useState<getEmpresas[]>([]);
   const [isloading, setIsLoading] = useState(false);
   const [isupdating, setIsUpdating] = useState(false);
+  const [generatecsv, setGeneratecsv] = useState(false);
 
   useEffect(() => {
     const fetchComerciantes = async () => {
@@ -132,6 +133,21 @@ function Home() {
       router.refresh();
     }
   }
+
+  const handleGenerateAllcsv = async (token: string) => {
+    setGeneratecsv(true);
+    try {
+      await generateAllCSV(token);
+
+    } catch (error) {
+      console.error(
+        "Error descargando archivo: ",
+        error
+      );
+    } finally {
+      setGeneratecsv(false);
+    }
+  }
   return (
     <div className="flex flex-col gap-4">
       <div className="flex border-b border-gray-300">
@@ -148,7 +164,7 @@ function Home() {
               </button>
             </Link>
             {rol === "administrador" && (
-              <button className="text-pink-600 bg-white border rounded-md p-1 px-2 cursor-pointer" onClick={() => generateAllCSV(token)}>
+              <button className={`text-pink-600 bg-white border rounded-md p-1 px-2 cursor-pointer ${generatecsv ? 'animate-bounce bg-gradient-to-r from-neutral-50 to-pink-300' : ''}`} onClick={() => handleGenerateAllcsv(token)}>
                 Descargar Reporte en CSV
               </button>
             )}
@@ -201,18 +217,16 @@ function Home() {
                       </button>
                       {empresa.estado === "activo" ? (
                         <button
-                        className={`text-red-600 hover:opacity-80 cursor-pointer ${
-                          isupdating ? "animate-pulse text-gray-400" : ""
-                        }`}
+                          className={`text-red-600 hover:opacity-80 cursor-pointer ${isupdating ? "animate-pulse text-gray-400" : ""
+                            }`}
                           onClick={() => handleStatusChange(empresa)}
                         >
                           <CloseIcon size={16} />
                         </button>
                       ) : (
                         <button
-                        className={`text-green-600 hover:opacity-80 cursor-pointer ${
-                          isupdating ? "animate-pulse text-gray-400" : ""
-                        }`}
+                          className={`text-green-600 hover:opacity-80 cursor-pointer ${isupdating ? "animate-pulse text-gray-400" : ""
+                            }`}
                           onClick={() => handleStatusChange(empresa)}
                         >
                           <CheckIcon size={16} />

@@ -26,6 +26,7 @@ export interface EmpresaBD {
   municipio: string;
   telefono?: string;
   correo?: string;
+  departamento?: string;
   fecha_registro: string; 
   estado: "activo" | "inactivo";
   fecha_actualizacion?: string; 
@@ -62,6 +63,7 @@ export interface Establecimiento {
   comid: string;
   totalIngresos: number;
   totalEmpleados: number;
+  totalEstablecimientos: number;
 }
 
 export interface LoginProps {
