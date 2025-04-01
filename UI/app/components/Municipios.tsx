@@ -18,19 +18,24 @@ export const MunicipiosField: React.FC<MunicipiosFieldProps> = ({
   ...props
 }) => {
   const [field, meta] = useField(props.name);
-  const { values } = useFormikContext<{ departamento: string }>();
+  const { values, setFieldValue } = useFormikContext<{ departamento: string; municipio?: string }>();
 
   const [municipiosList, setMunicipiosList] = useState<string[]>([]);
   const [isMunicipiosLoading, setIsMunicipiosLoading] = useState(false);
-
   const prevDepartamento = useRef<string | null>(null);
 
   useEffect(() => {
     const fetchMunicipios = async () => {
       if (!values.departamento || prevDepartamento.current === values.departamento) return;
-   
+
       if (municipiosCache.has(values.departamento)) {
-        setMunicipiosList(municipiosCache.get(values.departamento) || []);
+        const cachedMunicipios = municipiosCache.get(values.departamento) || [];
+        setMunicipiosList(cachedMunicipios);
+        
+        // Si el municipio actual no está en la lista, lo limpiamos
+        if (values.municipio && !cachedMunicipios.includes(values.municipio)) {
+          setFieldValue(props.name, "");
+        }
         return;
       }
 
@@ -39,6 +44,11 @@ export const MunicipiosField: React.FC<MunicipiosFieldProps> = ({
         const data = await getMunicipios(token, values.departamento);
         municipiosCache.set(values.departamento, data);
         setMunicipiosList(data);
+
+        // Si el municipio actual no está en la nueva lista, lo limpiamos
+        if (values.municipio && !data.includes(values.municipio)) {
+          setFieldValue(props.name, "");
+        }
       } catch (error) {
         console.error("Error al cargar municipios:", error);
         setMunicipiosList([]);
@@ -49,7 +59,7 @@ export const MunicipiosField: React.FC<MunicipiosFieldProps> = ({
 
     fetchMunicipios();
     prevDepartamento.current = values.departamento;
-  }, [values.departamento, token]);
+  }, [values.departamento, token, values.municipio, setFieldValue, props.name]);
 
   return (
     <div className="relative w-full">
@@ -66,6 +76,10 @@ export const MunicipiosField: React.FC<MunicipiosFieldProps> = ({
           disabled={!values.departamento}
           className="w-full px-4 py-2 border border-gray-600 rounded-md text-black focus:ring-2 focus:ring-pink-600 disabled:bg-gray-200"
         >
+          {field.value && !municipiosList.includes(field.value) && (
+            <option value={field.value}>{field.value}</option>
+          )}
+          
           <option value="">
             {isMunicipiosLoading ? "Cargando municipios..." : "Selecciona un municipio"}
           </option>
