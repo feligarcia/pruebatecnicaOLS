@@ -1,13 +1,12 @@
 import { useField, useFormikContext } from "formik";
 import { getMunicipios } from "../api/municipio";
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, SelectHTMLAttributes } from "react";
 import Loader from "./Loader";
 
-interface MunicipiosFieldProps {
+interface MunicipiosFieldProps extends SelectHTMLAttributes<HTMLSelectElement> {
   label: string;
   name: string;
   token: string;
-  [key: string]: any;
 }
 
 const municipiosCache = new Map<string, string[]>();

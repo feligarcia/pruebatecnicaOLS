@@ -85,7 +85,8 @@ function FormComerciante({ id }: FormProps) {
 
   const handleSubmit = async (formData: EmpresaBD, { resetForm }: { resetForm: () => void }) => {
     setSend(true)
-    const { departamento, ...formNoDepa } = formData
+  const { departamento, ...formNoDepa } = formData;
+  void departamento;
     const formDataWithUTC = {
       ...formNoDepa,
       fecha_registro: new Date(formNoDepa.fecha_registro).toISOString(),
@@ -122,10 +123,7 @@ function FormComerciante({ id }: FormProps) {
           enableReinitialize={true}
         >
 
-          {({ isSubmitting, values, setFieldValue }) =>
-
-
-          (
+          {() => (
             <div className="flex flex-col min-h-screen">
 
               <div className="bg-blue-200 flex-1">
